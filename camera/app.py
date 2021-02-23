@@ -1,15 +1,34 @@
 import cv2
+
+
 # print(cv2.__version__)
+
+def blur_face(img):
+    (h, w) = img.shape[:2]
+    # Размытие
+    dW = int(w / 3.0)
+    dH = int(h / 3.0)
+
+    if dW % 2 == 0:
+        dW -= 1
+
+    if dH % 2 == 0:
+        dH -= 1
+
+    return cv2.GaussianBlur(img, (dW, dH), 0)
+
 
 capture = cv2.VideoCapture(0)
 face_cascade = cv2.CascadeClassifier('../fastface_1/haarcascade_frontalface_default.xml')
 while True:
     ret, img = capture.read()
 
-    faces = face_cascade.detectMultiScale(img, scaleFactor=1.5, minNeighbors=5, minSize=(20, 20))
+    faces = face_cascade.detectMultiScale(img, scaleFactor=3, minNeighbors=5, minSize=(20, 20))
 
+    # Выделяем лицо
     for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        img[y:y+h, x:x+w] = blur_face(img[y:y+h, x:x+w])
 
     cv2.imshow('From my camera', img)
 
